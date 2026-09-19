@@ -110,6 +110,16 @@ body {
   display: none;
 }
 
+.vdd-drawer-open .excalidraw .App-menu__left {
+  transform: translateX(320px);
+}
+
+@media (max-width: 1023px) {
+  .vdd-drawer-open .excalidraw .App-menu__left {
+    transform: translateX(288px);
+  }
+}
+
 .vdd-drawer-open .vdd-symbol-floating-panel {
   transform: translateX(320px);
 }

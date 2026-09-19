@@ -62,6 +62,73 @@ test("loads a bundled template", async ({ page }) => {
   await expect.poll(() => page.evaluate(() => window.__VDD_EXCALIDRAW_API__?.getSceneElements().length ?? 0)).toBe(4);
 });
 
+test("renders existing and new geometric shapes without sketch roughness", async ({ page }) => {
+  await page.setViewportSize({ width: 1400, height: 900 });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Templates" }).click();
+  await page.getByRole("button", { name: "Circular Motif" }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const api = window.__VDD_EXCALIDRAW_API__;
+        if (!api) return null;
+        return {
+          currentItemRoughness: api.getAppState().currentItemRoughness,
+          roughness: api.getSceneElements().map((element) => element.roughness),
+        };
+      }),
+    )
+    .toEqual({ currentItemRoughness: 0, roughness: [0, 0, 0, 0] });
+
+  await page.evaluate(() => {
+    const api = window.__VDD_EXCALIDRAW_API__!;
+    api.updateScene({
+      elements: api.getSceneElements().map((element) => ({
+        ...element,
+        roughness: 2,
+        version: element.version + 1,
+      })),
+      appState: { currentItemRoughness: 2 },
+    });
+  });
+  await page.waitForTimeout(700);
+  await page.reload();
+
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const api = window.__VDD_EXCALIDRAW_API__;
+        if (!api) return null;
+        return {
+          currentItemRoughness: api.getAppState().currentItemRoughness,
+          roughness: api.getSceneElements().map((element) => element.roughness),
+        };
+      }),
+    )
+    .toEqual({ currentItemRoughness: 0, roughness: [0, 0, 0, 0] });
+});
+
+test("keeps native shape and text controls clear of an open sidebar", async ({ page }) => {
+  await page.setViewportSize({ width: 1600, height: 1000 });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Symbols" }).click();
+  await page.getByRole("radio", { name: "Text" }).click({ force: true });
+
+  const drawer = page.getByLabel("Elements drawer");
+  const nativeControls = page.locator(".App-menu__left");
+  await expect(drawer).toBeVisible();
+  await expect(nativeControls).toBeVisible();
+
+  const [drawerBox, controlsBox] = await Promise.all([
+    drawer.boundingBox(),
+    nativeControls.boundingBox(),
+  ]);
+  expect(drawerBox).not.toBeNull();
+  expect(controlsBox).not.toBeNull();
+  expect(controlsBox!.x).toBeGreaterThanOrEqual(drawerBox!.x + drawerBox!.width + 8);
+  expect(controlsBox!.x + controlsBox!.width).toBeLessThanOrEqual(1600);
+});
+
 test("rotates a selected stitch by an exact angle", async ({ page }) => {
   await page.setViewportSize({ width: 1400, height: 900 });
   await page.goto("/");

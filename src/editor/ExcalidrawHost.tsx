@@ -35,6 +35,7 @@ export function ExcalidrawHost() {
       appState: {
         ...(restoredProject?.excalidraw.appState ?? {}),
         viewBackgroundColor: "transparent",
+        currentItemRoughness: 0,
         currentItemStrokeColor: "#172033",
       },
     }),

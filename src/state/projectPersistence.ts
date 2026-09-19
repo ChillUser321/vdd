@@ -43,11 +43,42 @@ function normalizeProjectGroups(project: CrochetProject): CrochetProject {
   return changed ? { ...project, excalidraw: { ...project.excalidraw, elements } } : project;
 }
 
+function normalizeSolidGeometry(project: CrochetProject): CrochetProject {
+  let changed = project.excalidraw.appState.currentItemRoughness !== 0;
+  const elements = project.excalidraw.elements.map((value) => {
+    if (!value || typeof value !== "object" || !("id" in value) || !("type" in value)) {
+      return value;
+    }
+    if ("roughness" in value && value.roughness === 0) {
+      return value;
+    }
+    changed = true;
+    return { ...value, roughness: 0 };
+  });
+
+  if (!changed) return project;
+  return {
+    ...project,
+    excalidraw: {
+      ...project.excalidraw,
+      elements,
+      appState: {
+        ...project.excalidraw.appState,
+        currentItemRoughness: 0,
+      },
+    },
+  };
+}
+
+function normalizeProject(project: CrochetProject): CrochetProject {
+  return normalizeSolidGeometry(normalizeProjectGroups(project));
+}
+
 export function readAutosave(): CrochetProject | null {
   try {
     const raw = localStorage.getItem(getStorageKey());
     const value: unknown = raw ? JSON.parse(raw) : null;
-    return isCrochetProject(value) ? normalizeProjectGroups(value) : null;
+    return isCrochetProject(value) ? normalizeProject(value) : null;
   } catch { return null; }
 }
 
@@ -69,7 +100,7 @@ export function buildProject(api: ExcalidrawImperativeAPI = getExcalidrawApi()!)
         currentItemFillStyle: editorState.currentItemFillStyle,
         currentItemFontFamily: editorState.currentItemFontFamily,
         currentItemFontSize: editorState.currentItemFontSize,
-        currentItemRoughness: editorState.currentItemRoughness,
+        currentItemRoughness: 0,
         currentItemStrokeColor: editorState.currentItemStrokeColor,
         currentItemStrokeStyle: editorState.currentItemStrokeStyle,
         currentItemStrokeWidth: editorState.currentItemStrokeWidth,
@@ -88,7 +119,7 @@ export function buildProject(api: ExcalidrawImperativeAPI = getExcalidrawApi()!)
 }
 
 export function applyProject(project: CrochetProject, api = getExcalidrawApi()) {
-  project = normalizeProjectGroups(project);
+  project = normalizeProject(project);
   window.clearTimeout(timer);
   timer = undefined;
   useAppStore.getState().setProjectName(project.name);
