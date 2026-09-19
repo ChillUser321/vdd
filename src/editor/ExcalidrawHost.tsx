@@ -15,23 +15,30 @@ import {
 } from "./artboardViewport";
 import { setExcalidrawApi } from "./excalidrawApi";
 import { SymbolFloatingPanel } from "./SymbolFloatingPanel";
+import { readAutosave, scheduleAutosave } from "../state/projectPersistence";
+import { useGroupStore } from "../groups/groupStore";
 
 export function ExcalidrawHost() {
   const artboard = useAppStore((state) => state.artboard);
   const guides = useGuideStore((state) => state.guides);
   const syncSelection = useSelectionStore((state) => state.syncSelection);
+  const syncGroupsFromElements = useGroupStore((state) => state.syncFromElements);
   const [api, setApi] = useState<ExcalidrawImperativeAPI | null>(null);
   const [viewport, setViewport] = useState<ArtboardViewport | null>(null);
   const snapUpdateInProgress = useRef(false);
   const activeSnapGuide = useMemo(() => getActiveSquareSnapGuide(guides), [guides]);
+  const restoredProject = useMemo(() => readAutosave(), []);
   const initialData = useMemo(
     () => ({
+      elements: restoredProject?.excalidraw.elements as never[] | undefined,
+      files: restoredProject?.excalidraw.files as never,
       appState: {
+        ...(restoredProject?.excalidraw.appState ?? {}),
         viewBackgroundColor: "transparent",
         currentItemStrokeColor: "#172033",
       },
     }),
-    [],
+    [restoredProject],
   );
 
   const handleApi = useCallback((api: ExcalidrawImperativeAPI) => {
@@ -55,6 +62,14 @@ export function ExcalidrawHost() {
 
     return () => window.cancelAnimationFrame(frame);
   }, [api, artboard, updateViewport]);
+
+  useEffect(() => {
+    if (!restoredProject) return;
+    useAppStore.getState().setProjectName(restoredProject.name);
+    useAppStore.getState().setArtboard(restoredProject.artboard);
+    useGuideStore.getState().replaceGuides(restoredProject.guides);
+    useGroupStore.getState().replaceGroups(restoredProject.groups);
+  }, [restoredProject]);
 
   const snapSceneToGuide = useCallback(() => {
     if (!api || snapUpdateInProgress.current) {
@@ -94,7 +109,12 @@ export function ExcalidrawHost() {
           initialData={initialData}
           onChange={(elements, appState) => {
             syncSelection(elements, appState);
+            const selectedNativeGroupId = Object.keys(appState.selectedGroupIds ?? {}).find(
+              (id) => appState.selectedGroupIds?.[id],
+            ) ?? null;
+            syncGroupsFromElements(elements, selectedNativeGroupId);
             snapSceneToGuide();
+            scheduleAutosave();
           }}
           onScrollChange={() => {
             if (api) {

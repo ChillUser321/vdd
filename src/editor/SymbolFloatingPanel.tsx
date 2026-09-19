@@ -1,6 +1,7 @@
 import {
   deleteSelectedElement,
   duplicateSelectedElement,
+  updateSelectedElementAngle,
   updateSelectedElementOpacity,
   updateSelectedSymbolColor,
 } from "./selectedElementActions";
@@ -42,6 +43,7 @@ function TrashIcon() {
 export function SymbolFloatingPanel() {
   const activePanel = useAppStore((state) => state.activePanel);
   const selectedElement = useSelectionStore((state) => state.selectedElement);
+  const selectedElementAngle = useSelectionStore((state) => state.selectedElementAngle);
   const floatingPanelKind = getFloatingPanelKind(activePanel, selectedElement);
 
   if (floatingPanelKind !== "stitch" || !isSelectedSymbol(selectedElement)) {
@@ -52,6 +54,7 @@ export function SymbolFloatingPanel() {
     typeof selectedElement.customData?.symbolColor === "string"
       ? selectedElement.customData.symbolColor
       : DEFAULT_SYMBOL_COLOR;
+  const angle = Math.round((selectedElementAngle * 180) / Math.PI);
 
   return (
     <div
@@ -109,6 +112,37 @@ export function SymbolFloatingPanel() {
             />
           </div>
         </section>
+
+        <label className="grid gap-2 text-xs font-medium text-slate-600">
+          <span className="flex items-center justify-between">
+            <span>Angle</span>
+            <span className="text-slate-500">{angle}°</span>
+          </span>
+          <div className="grid grid-cols-[1fr_64px] items-center gap-2">
+            <input
+              aria-label="Stitch angle"
+              max={180}
+              min={-180}
+              onChange={(event) =>
+                updateSelectedElementAngle(selectedElement, Number(event.target.value))
+              }
+              step={1}
+              type="range"
+              value={angle}
+            />
+            <input
+              aria-label="Stitch angle degrees"
+              className="h-8 rounded-md border border-slate-300 px-2 text-sm"
+              max={180}
+              min={-180}
+              onChange={(event) =>
+                updateSelectedElementAngle(selectedElement, Number(event.target.value))
+              }
+              type="number"
+              value={angle}
+            />
+          </div>
+        </label>
 
         <label className="grid gap-2 text-xs font-medium text-slate-600">
           <span className="flex items-center justify-between">

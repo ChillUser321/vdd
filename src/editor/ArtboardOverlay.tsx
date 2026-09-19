@@ -19,13 +19,14 @@ export function ArtboardOverlay({ artboard, viewport }: ArtboardOverlayProps) {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute border border-slate-400 bg-white shadow-sm"
+      className="pointer-events-none absolute border border-slate-400 shadow-sm"
       data-testid="artboard-overlay"
       style={{
         height: artboard.height * viewport.zoom,
         left,
         top,
         width: artboard.width * viewport.zoom,
+        backgroundColor: artboard.backgroundColor,
       }}
     />
   );

@@ -36,3 +36,15 @@ export type CrochetProject = {
     notes?: string;
   };
 };
+
+export function isCrochetProject(value: unknown): value is CrochetProject {
+  if (!value || typeof value !== "object") return false;
+  const project = value as Partial<CrochetProject>;
+  const excalidraw = project.excalidraw as CrochetProject["excalidraw"] | undefined;
+  return project.version === 1 && typeof project.name === "string" &&
+    Boolean(project.artboard) && Boolean(excalidraw) &&
+    Array.isArray(excalidraw?.elements) &&
+    Boolean(excalidraw?.appState) && typeof excalidraw?.appState === "object" &&
+    Boolean(excalidraw?.files) && typeof excalidraw?.files === "object" &&
+    Array.isArray(project.guides) && Array.isArray(project.groups);
+}

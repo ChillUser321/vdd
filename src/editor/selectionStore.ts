@@ -7,6 +7,7 @@ import type {
 
 type SelectionStore = {
   selectedElement: ExcalidrawElement | null;
+  selectedElementAngle: number;
   clearSelection: () => void;
   syncSelection: (
     elements: readonly OrderedExcalidrawElement[],
@@ -16,7 +17,8 @@ type SelectionStore = {
 
 export const useSelectionStore = create<SelectionStore>((set) => ({
   selectedElement: null,
-  clearSelection: () => set({ selectedElement: null }),
+  selectedElementAngle: 0,
+  clearSelection: () => set({ selectedElement: null, selectedElementAngle: 0 }),
   syncSelection: (elements, appState) => {
     const selectedId = Object.keys(appState.selectedElementIds).find(
       (id) => appState.selectedElementIds[id],
@@ -24,6 +26,8 @@ export const useSelectionStore = create<SelectionStore>((set) => ({
     const selectedElement =
       elements.find((element) => element.id === selectedId && !element.isDeleted) ?? null;
 
-    set({ selectedElement });
+    // Track angle separately because Excalidraw may retain the element reference while
+    // its native rotation handle is moving.
+    set({ selectedElement, selectedElementAngle: selectedElement?.angle ?? 0 });
   },
 }));

@@ -8,10 +8,13 @@ import type {
   GuideLayer,
   PolarGridConfig,
   SquareGridConfig,
+  RadialGuideConfig,
+  CustomSvgGuideConfig,
 } from "./guideTypes";
 import { useGuideStore } from "./guideStore";
 import { renderPolarGrid } from "./renderPolarGrid";
 import { renderSquareGrid } from "./renderSquareGrid";
+import { renderRadialGuide } from "./renderRadialGuide";
 
 type GuideOverlayProps = {
   artboard: Artboard;
@@ -46,6 +49,14 @@ function renderGuide(guide: GuideLayer, artboard: Artboard) {
       config: guide.config,
       strokeWidth: guide.strokeWidth,
     });
+  }
+  if (guide.type === "radial-guide" && "spokes" in guide.config) {
+    const config = guide.config as RadialGuideConfig;
+    return renderRadialGuide({ ...config, color: guide.color, strokeWidth: guide.strokeWidth });
+  }
+  if (guide.type === "custom-svg-guide" && "svg" in guide.config) {
+    const config = guide.config as CustomSvgGuideConfig;
+    return <image href={`data:image/svg+xml,${encodeURIComponent(config.svg)}`} x={-config.width / 2} y={-config.height / 2} width={config.width} height={config.height} />;
   }
 
   return null;

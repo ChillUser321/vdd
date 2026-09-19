@@ -26,6 +26,10 @@
   - Artboard: non-scene overlay at the bottom.
   - Guides/grids: future metadata-driven layer above the artboard.
   - Objects such as symbols and text: Excalidraw scene elements above guides/grids.
+- Projects autosave in the browser and can be imported/exported as `.crochet.json` files.
+- PNG and SVG static export is available for full artboards and groups.
+- Templates and app-level group management are available.
+- Phones show a larger-screen gate; tablets and desktops load the editor.
 - GitHub Pages deployment uses GitHub Actions from `.github/workflows/deploy.yml`.
 
 ## Verification
@@ -46,16 +50,11 @@
 - `npm run preview` serves the production build locally.
 - `npm run test:e2e` runs Playwright tests.
 
-## TODOs
+## Deferred
 
 - Define the full feature list before adding more implementation.
 - Turn the full feature list into milestones and implementation phases.
 - Decide the project data model for saves, including artboard, guides, grids, objects, symbols, groups, and export settings.
-- Implement project JSON save/load.
-- Implement guide and grid features as metadata outside the Excalidraw scene.
-- Add text workflows and decide which text features use Excalidraw directly versus app-level metadata.
-- Add group metadata and selection workflows.
-- Add export bounds logic using the artboard overlay dimensions.
-- Add template loading and preview assets under `public/templates/`.
-- Add focused unit tests for data model, artboard presets, guide transformations, group metadata, and export bounds.
+- Animated exports are intentionally excluded unless a future instructional use case requires motion.
+- Continue bundle-size optimization and dependency security updates as compatible Excalidraw releases become available.
 - Keep UI/layout work covered by Playwright headless tests plus screenshot inspection before marking it done.

@@ -52,6 +52,13 @@ export function updateSelectedElementOpacity(element: ExcalidrawElement, opacity
   });
 }
 
+export function updateSelectedElementAngle(element: ExcalidrawElement, degrees: number) {
+  const normalizedDegrees = Math.min(180, Math.max(-180, degrees));
+  updateElement(element.id, {
+    angle: (normalizedDegrees * Math.PI) / 180,
+  });
+}
+
 export function updateSelectedSymbolColor(element: ExcalidrawElement, color: string) {
   const symbolId = element.customData?.symbolId;
   const symbol = crochetSymbols.find((item) => item.id === symbolId);

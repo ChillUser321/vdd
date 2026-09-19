@@ -49,7 +49,12 @@ type AppStore = {
   artboard: Artboard;
   preset: ArtboardPresetId;
   presets: Artboard[];
+  projectName: string;
+  saveStatus: "saved" | "saving";
   setActivePanel: (panel: AppStore["activePanel"]) => void;
+  setArtboard: (artboard: Artboard) => void;
+  setProjectName: (name: string) => void;
+  setSaveStatus: (status: AppStore["saveStatus"]) => void;
   setPreset: (preset: string) => void;
 };
 
@@ -58,7 +63,12 @@ export const useAppStore = create<AppStore>((set) => ({
   artboard: presets[0],
   preset: "A4_PORTRAIT",
   presets,
+  projectName: "Untitled pattern",
+  saveStatus: "saved",
   setActivePanel: (activePanel) => set({ activePanel }),
+  setArtboard: (artboard) => set({ artboard, preset: artboard.id }),
+  setProjectName: (projectName) => set({ projectName: projectName || "Untitled pattern" }),
+  setSaveStatus: (saveStatus) => set({ saveStatus }),
   setPreset: (preset) => {
     const nextArtboard = presets.find((item) => item.id === preset);
 

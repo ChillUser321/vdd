@@ -60,6 +60,8 @@ export function GuidePanel() {
           >
             Quarter polar
           </button>
+          <button className="rounded-md border border-slate-200 bg-white px-2 py-2 text-xs font-semibold text-slate-700 transition hover:border-teal-500" onClick={() => addGuideLayer("radial-guide")} type="button">Radial</button>
+          <button className="rounded-md border border-slate-200 bg-white px-2 py-2 text-xs font-semibold text-slate-700 transition hover:border-teal-500" onClick={() => addGuideLayer("custom-svg-guide")} type="button">Custom SVG</button>
         </div>
       </section>
 
@@ -79,7 +81,14 @@ export function GuidePanel() {
               <span className="block font-semibold">{guide.name}</span>
               <span className="text-xs text-slate-500">{guide.type}</span>
             </span>
-            <span className="text-xs text-slate-500">{guide.visible ? "Shown" : "Hidden"}</span>
+            <span className="text-right text-xs text-slate-500">
+              <span className="block">{guide.visible ? "Shown" : "Hidden"}</span>
+              {guide.type === "square-grid" ? (
+                <span className={guide.snapEnabled ? "font-semibold text-teal-700" : ""}>
+                  Snap {guide.snapEnabled ? "on" : "off"}
+                </span>
+              ) : null}
+            </span>
           </button>
         ))}
       </div>

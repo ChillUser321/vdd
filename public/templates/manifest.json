@@ -1,0 +1,4 @@
+[
+  { "id": "granny-square", "name": "Granny Square", "category": "Crochet", "preview": "/templates/granny-square.svg", "tags": ["square", "motif"] },
+  { "id": "circular-motif", "name": "Circular Motif", "category": "Crochet", "preview": "/templates/circular-motif.svg", "tags": ["circle", "motif"] }
+]

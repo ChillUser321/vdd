@@ -3,6 +3,5 @@ export type TemplateSummary = {
   name: string;
   category: string;
   preview: string;
-  design: string;
   tags: string[];
 };

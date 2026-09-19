@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { GuideLayer } from "./guideTypes";
 
-type GuidePreset = "square-grid" | "polar-grid" | "half-polar-grid" | "quarter-polar-grid";
+type GuidePreset = "square-grid" | "polar-grid" | "half-polar-grid" | "quarter-polar-grid" | "radial-guide" | "custom-svg-guide";
 
 let nextGuideId = 1;
 
@@ -29,7 +29,7 @@ function createSquareGridGuide(name: string, id: string): GuideLayer {
     position: { x: 0, y: 0 },
     rotation: 0,
     scale: 0.5,
-    snapEnabled: false,
+    snapEnabled: true,
     exportable: false,
     config: {
       horizontalSpacing: 48,
@@ -83,6 +83,7 @@ type GuideStore = {
   selectGuide: (id: string) => void;
   updateGuide: (id: string, patch: Partial<GuideLayer>) => void;
   updateGuideConfig: (id: string, patch: Partial<GuideLayer["config"]>) => void;
+  replaceGuides: (guides: GuideLayer[]) => void;
 };
 
 export const useGuideStore = create<GuideStore>((set) => ({
@@ -90,6 +91,20 @@ export const useGuideStore = create<GuideStore>((set) => ({
   selectedGuideId: defaultGuides[0].id,
   addGuide: (preset) =>
     set(({ guides }) => {
+      if (preset === "radial-guide" || preset === "custom-svg-guide") {
+        const guide: GuideLayer = preset === "radial-guide" ? {
+          role: "guide", id: createGuideId(preset), name: `Radial guide ${guides.filter((item) => item.type === preset).length + 1}`,
+          type: preset, visible: true, locked: false, opacity: 0.45, color: "#ea580c", strokeWidth: 1,
+          position: { x: 0, y: 0 }, rotation: 0, scale: 1, snapEnabled: false, exportable: false,
+          config: { spokes: 12, radius: 320 },
+        } : {
+          role: "guide", id: createGuideId(preset), name: `Custom SVG guide ${guides.filter((item) => item.type === preset).length + 1}`,
+          type: preset, visible: true, locked: false, opacity: 0.5, color: "#0f766e", strokeWidth: 1,
+          position: { x: 0, y: 0 }, rotation: 0, scale: 1, snapEnabled: false, exportable: false,
+          config: { svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path d="M100 5 195 100 100 195 5 100Z" fill="none" stroke="currentColor"/></svg>', width: 400, height: 400 },
+        };
+        return { guides: [...guides, guide], selectedGuideId: guide.id };
+      }
       const sameTypeCount =
         preset === "square-grid"
           ? guides.filter((guide) => guide.type === "square-grid").length
@@ -180,4 +195,8 @@ export const useGuideStore = create<GuideStore>((set) => ({
         : guide,
     ),
   })),
+  replaceGuides: (guides) => set({
+    guides: guides.length ? guides : defaultGuides,
+    selectedGuideId: guides[0]?.id ?? defaultGuides[0].id,
+  }),
 }));

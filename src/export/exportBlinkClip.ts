@@ -1,3 +1,3 @@
 export function exportBlinkClip() {
-  throw new Error("Blink clip export is not implemented yet.");
+  throw new Error("Animated export is intentionally unavailable for static crochet patterns.");
 }

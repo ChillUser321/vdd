@@ -8,6 +8,9 @@ test("renders the editor shell with an empty Excalidraw canvas", async ({ page }
   await expect(page.getByRole("button", { name: "Templates" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Properties" })).toBeVisible();
   await expect(page.getByRole("combobox", { name: "Canvas" })).toHaveValue("A4_PORTRAIT");
+  await expect(
+    page.locator("main section.relative").getByText("A4 portrait", { exact: true }),
+  ).toHaveCount(0);
 
   const editor = page.locator(".excalidraw").first();
   await expect(editor).toBeVisible();

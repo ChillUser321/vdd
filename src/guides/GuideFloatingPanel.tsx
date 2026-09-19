@@ -2,8 +2,9 @@ import type { ChangeEvent } from "react";
 import { getFloatingPanelKind } from "../editor/floatingPanels";
 import { useSelectionStore } from "../editor/selectionStore";
 import { useAppStore } from "../state/appStore";
+import { getExcalidrawApi } from "../editor/excalidrawApi";
 import { useGuideStore } from "./guideStore";
-import type { GuideLayer, PolarGridConfig, SquareGridConfig } from "./guideTypes";
+import type { CustomSvgGuideConfig, GuideLayer, PolarGridConfig, RadialGuideConfig, SquareGridConfig } from "./guideTypes";
 
 function clamp(value: number, min: number, max: number) {
   if (Number.isNaN(value)) {
@@ -104,6 +105,8 @@ export function GuideFloatingPanel() {
   const locked = selectedGuide.locked;
   const squareConfig = isSquareGridConfig(selectedGuide.config) ? selectedGuide.config : null;
   const polarConfig = isPolarGridConfig(selectedGuide.config) ? selectedGuide.config : null;
+  const radialConfig = "spokes" in selectedGuide.config ? selectedGuide.config as RadialGuideConfig : null;
+  const customSvgConfig = "svg" in selectedGuide.config ? selectedGuide.config as CustomSvgGuideConfig : null;
 
   const onNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     updateGuide(selectedGuide.id, { name: event.target.value });
@@ -180,12 +183,18 @@ export function GuideFloatingPanel() {
             <label className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700">
               <input
                 checked={selectedGuide.snapEnabled}
-                onChange={(event) =>
-                  updateGuide(selectedGuide.id, { snapEnabled: event.target.checked })
-                }
+                onChange={(event) => {
+                  const snapEnabled = event.target.checked;
+                  updateGuide(selectedGuide.id, { snapEnabled });
+                  getExcalidrawApi()?.setToast({
+                    message: snapEnabled
+                      ? "Snap is on — stitches align to grid intersections"
+                      : "Snap is off",
+                  });
+                }}
                 type="checkbox"
               />
-              Snap
+              Snap stitches
             </label>
             <label className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700">
               <input
@@ -383,6 +392,8 @@ export function GuideFloatingPanel() {
             </div>
           </section>
         ) : null}
+        {selectedGuide.type === "radial-guide" && radialConfig ? <section className="space-y-3 border-t border-slate-200 pt-3"><h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Radial guide</h3><div className="grid grid-cols-2 gap-2"><NumberInput disabled={locked} label="Spokes" min={2} max={180} value={radialConfig.spokes} onChange={(spokes) => updateGuideConfig(selectedGuide.id, { spokes })} /><NumberInput disabled={locked} label="Radius" min={20} max={4000} value={radialConfig.radius} onChange={(radius) => updateGuideConfig(selectedGuide.id, { radius })} /></div></section> : null}
+        {selectedGuide.type === "custom-svg-guide" && customSvgConfig ? <section className="space-y-3 border-t border-slate-200 pt-3"><h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Custom SVG</h3><label className="grid gap-1 text-xs font-medium text-slate-600">SVG file<input accept=".svg,image/svg+xml" disabled={locked} type="file" onChange={(event) => { const file = event.target.files?.[0]; if (file) void file.text().then((svg) => updateGuideConfig(selectedGuide.id, { svg })); }} /></label><div className="grid grid-cols-2 gap-2"><NumberInput disabled={locked} label="Width" min={20} max={4000} value={customSvgConfig.width} onChange={(width) => updateGuideConfig(selectedGuide.id, { width })} /><NumberInput disabled={locked} label="Height" min={20} max={4000} value={customSvgConfig.height} onChange={(height) => updateGuideConfig(selectedGuide.id, { height })} /></div></section> : null}
       </div>
     </div>
   );

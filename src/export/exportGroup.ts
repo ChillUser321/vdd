@@ -1,3 +1,1 @@
-export function exportGroup() {
-  throw new Error("Group export is not implemented yet.");
-}
+export { exportStaticImage as exportGroup } from "./staticExport";

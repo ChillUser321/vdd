@@ -1,5 +1,6 @@
 import { clearSelectedElements } from "../../editor/selectedElementActions";
 import { useAppStore } from "../../state/appStore";
+import { getExcalidrawApi } from "../../editor/excalidrawApi";
 
 const tools = ["Templates", "Symbols", "Guides", "Shapes", "Text", "Groups", "Export"] as const;
 type ToolName = (typeof tools)[number];
@@ -25,9 +26,13 @@ export function LeftToolbar() {
               clearSelectedElements();
             }
 
+            if (nextPanel === "Shapes") getExcalidrawApi()?.setActiveTool({ type: "rectangle" });
+            if (nextPanel === "Text") getExcalidrawApi()?.setActiveTool({ type: "text" });
+
             setActivePanel(nextPanel);
           }}
           type="button"
+          aria-pressed={activePanel === tool}
         >
           {tool}
         </button>

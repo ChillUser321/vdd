@@ -25,6 +25,14 @@ body {
   min-width: 320px;
 }
 
+@layer components {
+  .vdd-button {
+    @apply h-9 items-center justify-center rounded-md border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-teal-500 hover:text-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-200;
+  }
+  .vdd-primary-button { @apply h-10 rounded-md bg-teal-700 px-3 text-sm font-semibold text-white transition hover:bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-200 disabled:opacity-50; }
+  .vdd-field { @apply h-9 rounded-md border border-slate-300 bg-white px-2 text-sm text-slate-900 outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-100; }
+}
+
 .excalidraw {
   --color-primary: #0f766e;
   --color-primary-darker: #115e59;
@@ -32,8 +40,70 @@ body {
   --color-primary-light: #ccfbf1;
 }
 
-.vdd-drawer-open .excalidraw .App-menu__left {
-  transform: translateX(320px);
+/* Excalidraw moves its menu into the footer in its compact layout. Keep the
+   same workspace-relative top-left position at every supported app width. */
+.excalidraw.excalidraw--mobile .App-bottom-bar .Island:has(.main-menu-trigger) {
+  position: static;
+}
+
+.excalidraw.excalidraw--mobile .App-bottom-bar .main-menu-trigger {
+  position: absolute;
+  top: 16px;
+  left: 2px;
+  z-index: 4;
+}
+
+/* Use the free space on either side of the centered drawing toolbar when the
+   editor itself is wide enough. Compact layouts keep these controls below. */
+@media (min-width: 1400px) {
+  .excalidraw:not(.excalidraw--mobile) .App-menu_bottom {
+    position: static !important;
+  }
+
+  .excalidraw:not(.excalidraw--mobile) .layer-ui__wrapper__footer-left {
+    position: static !important;
+  }
+
+  .excalidraw:not(.excalidraw--mobile) .zoom-actions {
+    position: absolute !important;
+    top: 16px !important;
+    right: calc(50% + 283px) !important;
+    z-index: 4;
+  }
+
+  .excalidraw:not(.excalidraw--mobile) .undo-redo-buttons {
+    position: absolute !important;
+    top: 16px !important;
+    left: calc(50% + 283px) !important;
+    z-index: 4;
+  }
+
+  .excalidraw:not(.excalidraw--mobile) .layer-ui__wrapper__footer-right {
+    position: absolute !important;
+    right: 16px !important;
+    bottom: 16px !important;
+  }
+
+  .excalidraw:not(.excalidraw--mobile) .disable-zen-mode {
+    top: auto !important;
+    right: 16px !important;
+    bottom: 16px !important;
+  }
+}
+
+.vdd-drawer-open .excalidraw .main-menu-trigger {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.vdd-drawer-open .excalidraw .App-menu_bottom {
+  padding-left: 320px;
+}
+
+@media (max-width: 1023px) {
+  .vdd-drawer-open .excalidraw .App-menu_bottom { padding-left: 288px; }
+  .vdd-drawer-open .vdd-symbol-floating-panel,
+  .vdd-drawer-open .vdd-guide-floating-panel { transform: translateX(288px); }
 }
 
 .vdd-custom-floating-panel-active .excalidraw .App-menu__left {

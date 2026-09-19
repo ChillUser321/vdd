@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-This repository currently contains planning material for a frontend-only crochet design editor. The source specification is `research/crochet_design_editor_codex_spec.md`.
+This repository contains a frontend-only crochet design editor. The source specification is `research/crochet_design_editor_codex_spec.md`.
 
 When implementation begins, use the structure described in the spec:
 
@@ -16,13 +16,13 @@ Keep feature code close to its domain. Do not mix Excalidraw adapter logic with 
 
 ## Build, Test, and Development Commands
 
-No package manager files are present yet. After scaffolding the Vite React TypeScript app, expected commands should be:
+Use the checked-in npm package files and these commands:
 
 - `npm install` to install dependencies.
 - `npm run dev` to start the local Vite development server.
 - `npm run build` to produce the production build.
 - `npm run preview` to serve the built app locally.
-- `npm test` or `npm run test` once a test runner is added.
+- `npm run test:e2e` for the Playwright regression suite.
 
 Document command changes in `README.md` and keep this file updated.
 
